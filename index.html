@@ -62,9 +62,9 @@
         .slide-ctrl, .photo-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 100; }
         .mini-btn { font-size: 12px; padding: 6px 12px; background: rgba(0,0,0,0.85); color: white; border: none; border-radius: 6px; cursor: pointer; }
 
-        #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
+        #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; font-size: 24px;}
         .p-bar { width: 60%; height: 10px; background: #333; border-radius: 10px; overflow: hidden; margin-top:15px; }
-        .p-fill { width: 0%; height: 100%; background: var(--accent); }
+        .p-fill { width: 0%; height: 100%; background: var(--accent); transition: 0.1s; }
     </style>
 </head>
 <body>
@@ -72,8 +72,7 @@
 <div id="theme-overlay">
     <div class="theme-modal">
         <h2 style="color:var(--accent); margin:0;">SELECT REPORT THEME</h2>
-        <div class="theme-grid" id="theme-grid">
-            </div>
+        <div class="theme-grid" id="theme-grid"></div>
         <div style="margin-top:25px; border-top: 1px solid #444; padding-top:20px;">
             <input type="file" id="custom-bg-input" accept="image/*" style="display:none" onchange="handleCustomBg(this)">
             <button class="btn" style="background:#10b981; width:100%; padding:15px;" onclick="document.getElementById('custom-bg-input').click()">📁 Use Custom Background</button>
@@ -107,14 +106,14 @@
     const container = document.getElementById('container');
     const sidebar = document.getElementById('sidebar');
 
-    // --- तुमच्या GitHub लिंक्स इथे टाका ---
+    // --- दुरुस्त केलेल्या RAW लिंक्स ---
     const backgrounds = [
-        "https://github.com/rohitb8222-create/SumeetelkopptV5/blob/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg1.jpg",
-        "https://github.com/rohitb8222-create/SumeetelkopptV5/blob/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg2.jpg",
-        "https://github.com/rohitb8222-create/SumeetelkopptV5/blob/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg3.jpg",
-        "https://github.com/rohitb8222-create/SumeetelkopptV5/blob/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg4.jpg",
-        "https://github.com/rohitb8222-create/SumeetelkopptV5/blob/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg5.jpg",
-        "https://github.com/rohitb8222-create/SumeetelkopptV5/blob/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg6.jpg"
+        "https://raw.githubusercontent.com/rohitb8222-create/SumeetelkopptV5/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg1.jpg",
+        "https://raw.githubusercontent.com/rohitb8222-create/SumeetelkopptV5/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg2.jpg",
+        "https://raw.githubusercontent.com/rohitb8222-create/SumeetelkopptV5/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg3.jpg",
+        "https://raw.githubusercontent.com/rohitb8222-create/SumeetelkopptV5/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg4.jpg",
+        "https://raw.githubusercontent.com/rohitb8222-create/SumeetelkopptV5/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg5.jpg",
+        "https://raw.githubusercontent.com/rohitb8222-create/SumeetelkopptV5/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg6.jpg"
     ];
 
     window.onload = () => {
@@ -123,15 +122,14 @@
             const item = document.createElement('div');
             item.className = 'theme-item';
             item.onclick = () => applyTheme(url);
-            item.innerHTML = `<img src="${url}" onerror="this.src='https://via.placeholder.com/220x125?text=Link+Error'"><span>Theme ${i+1}</span>`;
+            item.innerHTML = `<img src="${url}" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/220x125?text=Link+Error'"><span>Theme ${i+1}</span>`;
             grid.appendChild(item);
         });
-        addIntro(); // पहिली स्लाईड ऑटो ॲड
+        addIntro(); 
         adjustScale();
         initDrag();
     };
 
-    // Sidebar Sorting
     new Sortable(sidebar, {
         animation: 150,
         onEnd: function () {
@@ -144,7 +142,9 @@
     function applyTheme(url) {
         selectedBg = url;
         document.getElementById('theme-overlay').style.display = 'none';
-        document.querySelectorAll('.slide').forEach(s => s.style.backgroundImage = `url(${selectedBg})`);
+        document.querySelectorAll('.slide').forEach(s => {
+            s.style.backgroundImage = `url(${selectedBg})`;
+        });
     }
 
     function handleCustomBg(input) {
@@ -207,10 +207,10 @@
                 <div class="photo-grid"></div>
             `;
             const grid = div.querySelector('.photo-grid');
-            const imgData = await loadImg(files[i], grid);
+            const imgData1 = await loadImg(files[i], grid);
             if (files[i+1]) await loadImg(files[i+1], grid);
             container.appendChild(div);
-            createThumb(id, imgData, false);
+            createThumb(id, imgData1, false);
             new Sortable(grid, { group: 'photos', animation: 200 });
         }
         updateNums();
@@ -267,7 +267,10 @@
     }
 
     function updateNums() {
-        document.querySelectorAll('.thumb-wrapper').forEach((w, i) => w.querySelector('.thumb-num').innerText = i + 1);
+        document.querySelectorAll('.thumb-wrapper').forEach((w, i) => {
+            const num = w.querySelector('.thumb-num');
+            if(num) num.innerText = i + 1;
+        });
     }
 
     function removeSlide(id) {
@@ -321,7 +324,6 @@
         const scale = editorWidth < 960 ? editorWidth / 960 : 1;
         container.style.transform = `scale(${scale})`;
     }
-    window.addEventListener('resize', adjustScale);
 </script>
 </body>
 </html>
