@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1024"> 
-    <title>Sumeet Elko - Master HD Editor</title>
+    <title>Sumeet Elko - Final HD Editor</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -29,8 +29,7 @@
         .btn-add { background: var(--accent); }
         .btn-pdf { background: #10b981; border: 2px solid #fff; }
 
-        /* Sidebar Slider with Sortable */
-        .sidebar { width: 100%; height: 130px; background: #111; overflow-x: auto; display: flex; padding: 15px; gap: 20px; align-items: center; scrollbar-width: thin; }
+        .sidebar { width: 100%; height: 130px; background: #111; overflow-x: auto; display: flex; padding: 15px; gap: 20px; align-items: center; }
         .thumb-wrapper { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; cursor: grab; }
         .thumb-box { width: 140px; height: 80px; background: #fff; border: 2px solid #555; border-radius: 4px; overflow: hidden; }
         .thumb-box img { width: 100%; height: 100%; object-fit: cover; }
@@ -45,7 +44,6 @@
             background-color: white; position: relative; 
             box-shadow: 0 0 50px rgba(0,0,0,0.8); flex-shrink: 0; 
             margin-bottom: 100px; color: #000; overflow: hidden;
-            cursor: default;
         }
 
         .draggable-text { position: absolute; cursor: move; padding: 5px; z-index: 20; }
@@ -73,18 +71,12 @@
 
 <div id="theme-overlay">
     <div class="theme-modal">
-        <h2 style="color:var(--accent); margin:0;">SELECT BACKGROUND</h2>
-        <div class="theme-grid">
-            <div class="theme-item" onclick="applyTheme('bg1.jpg')"><img src="bg1.jpg" onerror="this.src='https://via.placeholder.com/220x125?text=bg1.jpg'"><span>Theme 1</span></div>
-            <div class="theme-item" onclick="applyTheme('bg2.jpg')"><img src="bg2.jpg" onerror="this.src='https://via.placeholder.com/220x125?text=bg2.jpg'"><span>Theme 2</span></div>
-            <div class="theme-item" onclick="applyTheme('bg3.jpg')"><img src="bg3.jpg" onerror="this.src='https://via.placeholder.com/220x125?text=bg3.jpg'"><span>Theme 3</span></div>
-            <div class="theme-item" onclick="applyTheme('bg4.jpg')"><img src="bg4.jpg" onerror="this.src='https://via.placeholder.com/220x125?text=bg4.jpg'"><span>Theme 4</span></div>
-            <div class="theme-item" onclick="applyTheme('bg5.jpg')"><img src="bg5.jpg" onerror="this.src='https://via.placeholder.com/220x125?text=bg5.jpg'"><span>Theme 5</span></div>
-            <div class="theme-item" onclick="applyTheme('bg6.jpg')"><img src="bg6.jpg" onerror="this.src='https://via.placeholder.com/220x125?text=bg6.jpg'"><span>Theme 6</span></div>
-        </div>
+        <h2 style="color:var(--accent); margin:0;">SELECT REPORT THEME</h2>
+        <div class="theme-grid" id="theme-grid">
+            </div>
         <div style="margin-top:25px; border-top: 1px solid #444; padding-top:20px;">
             <input type="file" id="custom-bg-input" accept="image/*" style="display:none" onchange="handleCustomBg(this)">
-            <button class="btn" style="background:#10b981; width:100%; padding:15px;" onclick="document.getElementById('custom-bg-input').click()">📁 Choose Custom Background</button>
+            <button class="btn" style="background:#10b981; width:100%; padding:15px;" onclick="document.getElementById('custom-bg-input').click()">📁 Use Custom Background</button>
         </div>
     </div>
 </div>
@@ -115,29 +107,36 @@
     const container = document.getElementById('container');
     const sidebar = document.getElementById('sidebar');
 
-    // Sidebar Sorting Logic
+    // --- तुमच्या GitHub लिंक्स इथे टाका ---
+    const backgrounds = [
+        "https://github.com/rohitb8222-create/SumeetelkopptV5/blob/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg1.jpg",
+        "https://github.com/rohitb8222-create/SumeetelkopptV5/blob/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg2.jpg",
+        "https://github.com/rohitb8222-create/SumeetelkopptV5/blob/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg3.jpg",
+        "https://github.com/rohitb8222-create/SumeetelkopptV5/blob/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg4.jpg",
+        "https://github.com/rohitb8222-create/SumeetelkopptV5/blob/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg5.jpg",
+        "https://github.com/rohitb8222-create/SumeetelkopptV5/blob/fc0ad259898ea7365db0106cc4e264abfc034ccd/bg6.jpg"
+    ];
+
+    window.onload = () => {
+        const grid = document.getElementById('theme-grid');
+        backgrounds.forEach((url, i) => {
+            const item = document.createElement('div');
+            item.className = 'theme-item';
+            item.onclick = () => applyTheme(url);
+            item.innerHTML = `<img src="${url}" onerror="this.src='https://via.placeholder.com/220x125?text=Link+Error'"><span>Theme ${i+1}</span>`;
+            grid.appendChild(item);
+        });
+        addIntro(); // पहिली स्लाईड ऑटो ॲड
+        adjustScale();
+        initDrag();
+    };
+
+    // Sidebar Sorting
     new Sortable(sidebar, {
         animation: 150,
         onEnd: function () {
             const wrappers = document.querySelectorAll('.thumb-wrapper');
-            wrappers.forEach(w => {
-                const slideId = w.dataset.id;
-                container.appendChild(document.getElementById(slideId));
-            });
-            updateNums();
-        }
-    });
-
-    // Main Slides Vertical Sorting
-    new Sortable(container, {
-        animation: 150,
-        handle: '.slide',
-        onEnd: function () {
-            const slides = document.querySelectorAll('.slide');
-            slides.forEach(s => {
-                const thumb = document.querySelector(`.thumb-wrapper[data-id="${s.id}"]`);
-                sidebar.appendChild(thumb);
-            });
+            wrappers.forEach(w => container.appendChild(document.getElementById(w.dataset.id)));
             updateNums();
         }
     });
@@ -272,8 +271,10 @@
     }
 
     function removeSlide(id) {
-        document.getElementById(id).remove();
-        document.querySelector(`.thumb-wrapper[data-id="${id}"]`).remove();
+        const slide = document.getElementById(id);
+        if(slide) slide.remove();
+        const thumb = document.querySelector(`.thumb-wrapper[data-id="${id}"]`);
+        if(thumb) thumb.remove();
         updateNums();
     }
 
@@ -310,7 +311,7 @@
             if (i > 0) doc.addPage();
             doc.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 960, 540);
         }
-        doc.save(`Report_${Date.now()}.pdf`);
+        doc.save(`Sumeet_Report_${Date.now()}.pdf`);
         document.getElementById('loader').style.display = 'none';
         thDiv.remove();
     }
@@ -320,11 +321,6 @@
         const scale = editorWidth < 960 ? editorWidth / 960 : 1;
         container.style.transform = `scale(${scale})`;
     }
-
-    window.onload = () => { 
-        addIntro(); 
-        adjustScale(); 
-    };
     window.addEventListener('resize', adjustScale);
 </script>
 </body>
